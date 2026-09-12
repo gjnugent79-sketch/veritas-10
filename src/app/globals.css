@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --page: #f7f7f5;
+  --surface: #ffffff;
+  --surface-2: #f0f0ec;
+  --ink: #121212;
+  --muted: #6b6b66;
+  --border: #e6e6e1;
+  --accent: #6b4eff;
+  --accent-dark: #5538e0;
+}
+
+body {
+  color: var(--ink);
+  background: var(--page);
+  font-feature-settings: "ss01" on, "cv11" on;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border bg-white shadow-sm;
+    border-color: var(--border);
+    background-color: var(--surface);
+  }
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    --tw-ring-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+}
