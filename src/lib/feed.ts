@@ -1,7 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 import { resolveOutletLean } from './outlets';
 import type { FeedItem, Pillar } from './types';
-import { createHash } from 'crypto';
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -40,8 +39,16 @@ function stripHtml(html: string): string {
     .trim();
 }
 
+/** Simple non-crypto hash — browser-safe (no Node crypto). */
 function hashId(parts: string[]): string {
-  return createHash('sha1').update(parts.join('|')).digest('hex').slice(0, 16);
+  const s = parts.join('|');
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(16).padStart(8, '0') +
+    Math.imul(h ^ s.length, 16777619 >>> 0).toString(16).padStart(8, '0');
 }
 
 export function normaliseRssXml(

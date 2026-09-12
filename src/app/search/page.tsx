@@ -8,6 +8,7 @@ import { FollowButton } from '@/components/FollowButton';
 import { useProfile } from '@/components/ProfileProvider';
 import { PILLARS, searchCatalogue } from '@/lib/catalogue';
 import { NO_RELIABLE_SOURCE_MESSAGE } from '@/lib/factcheck';
+import { gatherFreeText } from '@/lib/gather';
 import type { StoryBriefing } from '@/lib/types';
 
 export default function SearchPage() {
@@ -27,15 +28,15 @@ export default function SearchPage() {
     setMessage(null);
     setStories(null);
     try {
-      const params = new URLSearchParams({
-        q: q.trim(),
-        lean: profile.politicsLean,
+      const result = await gatherFreeText({
+        query: q.trim(),
+        politicsLean: profile.politicsLean,
       });
-      const res = await fetch(`/api/gather?${params}`);
-      const data = await res.json();
-      setStories(data.stories || []);
-      setUsedFixtures(!!data.usedFixtures);
-      setMessage(data.message || null);
+      setStories(result.stories || []);
+      setUsedFixtures(!!result.usedFixtures);
+      setMessage(
+        result.stories.length === 0 ? NO_RELIABLE_SOURCE_MESSAGE : null,
+      );
     } catch {
       setStories([]);
       setMessage(NO_RELIABLE_SOURCE_MESSAGE);

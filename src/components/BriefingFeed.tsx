@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { Pillar, PoliticsLean, StoryBriefing } from '@/lib/types';
+import { gatherForEntity, gatherForFollows } from '@/lib/gather';
 import { StoryCard } from './StoryCard';
 import { NO_RELIABLE_SOURCE_MESSAGE } from '@/lib/factcheck';
 import Link from 'next/link';
@@ -32,32 +33,24 @@ export function BriefingFeed({
 
     const followIds = followsKey ? followsKey.split(',') : [];
 
-    const params = new URLSearchParams();
-    params.set('lean', lean);
-    if (entityId) params.set('entity', entityId);
-    if (followIds.length) params.set('follows', followsKey);
-    if (pillar) params.set('pillar', pillar);
-
     if (!entityId && followIds.length === 0) {
       setStories([]);
       return;
     }
 
-    fetch(`/api/briefing?${params.toString()}`)
-      .then(async (r) => {
-        const data = await r.json();
+    const run = entityId
+      ? gatherForEntity({ entityId, politicsLean: lean })
+      : gatherForFollows({ followIds, politicsLean: lean, pillar });
+
+    run
+      .then((result) => {
         if (cancelled) return;
-        if (!data.ok) {
-          setError(data.error || 'Failed to load');
-          setStories([]);
-          return;
-        }
-        setStories(data.stories || []);
-        setUsedFixtures(!!data.usedFixtures);
+        setStories(result.stories || []);
+        setUsedFixtures(!!result.usedFixtures);
       })
       .catch(() => {
         if (!cancelled) {
-          setError('Could not reach the briefing service.');
+          setError('Could not gather the briefing.');
           setStories([]);
         }
       });

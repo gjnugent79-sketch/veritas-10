@@ -4,6 +4,12 @@ Personalised editorial news hub across five pillars — **Football**, **Politics
 
 > Design note: where the original brief fought clarity (e.g. dense chrome, Lovable badge, “ten countries” framing), this build prefers a calmer editorial layout — generous type, card surfaces, light theme, desktop sidebar + mobile bottom nav.
 
+## Public test URL
+
+**https://gjnugent79-sketch.github.io/veritas-10/**
+
+GitHub Pages serves the static `out/` export from the `gh-pages` branch (`basePath` `/veritas-10`). Live RSS often fails in the browser because of CORS; the app then uses **Cached briefing** fixtures so the happy path stays filled.
+
 ## Run locally
 
 ```bash
@@ -11,12 +17,11 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000/veritas-10](http://localhost:3000/veritas-10) (dev uses the same `basePath`).
 
 ```bash
 npm test          # unit tests
-npm run build     # production build
-npm start         # serve production build
+npm run build     # static export → out/
 ```
 
 ### Environment
@@ -62,13 +67,13 @@ This is **our curated map**, not scraped from AllSides or MBFC:
 
 ## Ingestion
 
-- Server-side RSS fetch (avoids browser CORS) → normalise → cluster → short original briefing.
-- Cache ~10 minutes.
-- Fallback fixtures marked **Cached briefing**.
+- Client-side gather (static Pages build has no API routes) → normalise → cluster → short original briefing.
+- In-memory cache ~10 minutes in the browser session.
+- Live RSS often blocked by CORS on GitHub Pages; fallback fixtures marked **Cached briefing**.
 
 ## Tech
 
-- Next.js 14 App Router + TypeScript + Tailwind CSS
+- Next.js 14 App Router + TypeScript + Tailwind CSS (`output: 'export'` for GitHub Pages)
 - `fast-xml-parser` for RSS
 - Vitest unit tests: lean filtering, fact-check aggregation, feed normalisation
 

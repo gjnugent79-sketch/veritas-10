@@ -30,7 +30,6 @@ async function fetchFeed(url: string): Promise<string | null> {
         'User-Agent': 'Veritas10Bot/1.0 (+https://github.com/gjnugent79-sketch/veritas-10)',
         Accept: 'application/rss+xml, application/xml, text/xml, */*',
       },
-      next: { revalidate: 600 },
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) return null;
